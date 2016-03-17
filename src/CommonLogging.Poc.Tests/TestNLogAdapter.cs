@@ -116,7 +116,7 @@ memTargetException.Layout =
             Common.Logging.LogManager.Adapter = nLogAdapter;
 
             var contextCorp1 = new MySampleAppContext { CorpName = "corp1" };
-            MySampleApp appCorp1 = new MySampleApp(nLogAdapter.GetLogger("MySampleApp"), contextCorp1);
+            MySampleApp appCorp1 = new MySampleApp(nLogAdapter.GetLogger(typeof(MySampleApp)), contextCorp1);
 
             appCorp1.DoSomethingUsingCorpName();
             appCorp1.DoSomethingWithoutCorpName();
@@ -124,13 +124,63 @@ memTargetException.Layout =
 
 
             var contextCorp2 = new MySampleAppContext { CorpName = "corp2" };
-            MySampleApp appCorp2 = new MySampleApp(nLogAdapter.GetLogger("MySampleApp"), contextCorp2);
+            MySampleApp appCorp2 = new MySampleApp(nLogAdapter.GetLogger(typeof(MySampleApp)), contextCorp2);
 
             appCorp2.DoSomethingUsingCorpName();
             appCorp2.DoSomethingWithoutCorpName();
             Assert.Throws<InvalidOperationException>(() => appCorp2.ThrowSampleException());
 
             memTargetCorp.Logs.Count().ShouldBe(4);
+        }
+
+        [Fact]
+        public void TestNLogAdapter_WhenAppsLogInParallel_AndLoggingByCorp_AndOnlyElevatingOneCorp_OnlyLogDebugMessagesOfOneCorp()
+        {
+            // Load extensions
+            NLog.Config.ConfigurationItemFactory.Default.RegisterItemsFromAssembly(Assembly.Load("CommonLogging.NLogExtensions"));
+
+            // Configure NLog to write into MemTarget
+            var config = new LoggingConfiguration();
+            var memTargetCorp = new NLog.Targets.MemoryTarget();
+            memTargetCorp.Layout =
+@"{
+    ""timestamp"" : '${longdate}',
+    ""correlationId"" : '${mdc:item=correlationId}',
+    ""level"" : '${level:upperCase=true}',
+    ""message"" : '${message}',
+    ""corpName"" : '${mdc:item=corp}'
+}";
+
+            // Log as Error by default exception for Corp1:Debug
+            config.AddTarget("memTarget", memTargetCorp);
+            var rule = new LoggingRule("*", NLog.LogLevel.Debug, memTargetCorp);
+            rule.Filters.Add(new NLog.Filters.ConditionBasedFilter { Condition = NLog.Conditions.ConditionParser.ParseExpression("ignoreLogCorp('${mdc:item=corp}', level)"), Action = NLog.Filters.FilterResult.IgnoreFinal });
+            config.LoggingRules.Add(rule);
+            NLog.LogManager.Configuration = config;
+
+
+            var properties = new NameValueCollection();
+            var nLogAdapter = new Common.Logging.NLog.NLogLoggerFactoryAdapter(properties);
+            Common.Logging.LogManager.Adapter = nLogAdapter;
+
+            var concurrentApps = new List<MySampleApp>();
+            for (int i = 1; i <= 10; i++)
+            {
+                var contextCorp = new MySampleAppContext { CorpName = "corp" +i };
+                MySampleApp appCorp = new MySampleApp(nLogAdapter.GetLogger(typeof(MySampleApp)), contextCorp);
+                concurrentApps.Add(appCorp);
+            }
+
+            Parallel.ForEach(concurrentApps,
+                app =>
+                {
+                    app.DoSomethingUsingCorpName();
+                    app.DoSomethingWithoutCorpName();
+                    Assert.Throws<InvalidOperationException>(() => app.ThrowSampleException());
+                });
+                
+
+            memTargetCorp.Logs.Count().ShouldBe(12);
         }
     }
 }
