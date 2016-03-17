@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ILogExtensions.cs" />
+    <Compile Include="AnotherSampleApp.cs" />
     <Compile Include="MySampleApp.cs" />
     <Compile Include="MySampleAppContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

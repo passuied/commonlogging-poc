@@ -58,7 +58,7 @@ memTargetException.Layout =
             Common.Logging.LogManager.Adapter = nLogAdapter;
 
             var context = new MySampleAppContext { CorpName = "corp1" };
-            MySampleApp app = new MySampleApp(nLogAdapter.GetLogger("MySampleApp"), context);
+            MySampleApp app = new MySampleApp(nLogAdapter, context);
 
             app.DoSomethingUsingCorpName();
             app.DoSomethingWithoutCorpName();
@@ -116,7 +116,7 @@ memTargetException.Layout =
             Common.Logging.LogManager.Adapter = nLogAdapter;
 
             var contextCorp1 = new MySampleAppContext { CorpName = "corp1" };
-            MySampleApp appCorp1 = new MySampleApp(nLogAdapter.GetLogger(typeof(MySampleApp)), contextCorp1);
+            MySampleApp appCorp1 = new MySampleApp(nLogAdapter, contextCorp1);
 
             appCorp1.DoSomethingUsingCorpName();
             appCorp1.DoSomethingWithoutCorpName();
@@ -124,7 +124,7 @@ memTargetException.Layout =
 
 
             var contextCorp2 = new MySampleAppContext { CorpName = "corp2" };
-            MySampleApp appCorp2 = new MySampleApp(nLogAdapter.GetLogger(typeof(MySampleApp)), contextCorp2);
+            MySampleApp appCorp2 = new MySampleApp(nLogAdapter, contextCorp2);
 
             appCorp2.DoSomethingUsingCorpName();
             appCorp2.DoSomethingWithoutCorpName();
@@ -167,7 +167,7 @@ memTargetException.Layout =
             for (int i = 1; i <= 10; i++)
             {
                 var contextCorp = new MySampleAppContext { CorpName = "corp" +i };
-                MySampleApp appCorp = new MySampleApp(nLogAdapter.GetLogger(typeof(MySampleApp)), contextCorp);
+                MySampleApp appCorp = new MySampleApp(nLogAdapter, contextCorp);
                 concurrentApps.Add(appCorp);
             }
 
@@ -182,5 +182,85 @@ memTargetException.Layout =
 
             memTargetCorp.Logs.Count().ShouldBe(12);
         }
+
+        [Fact]
+        public void TestNLogAdapter_GivenMultipleClasses_WhenALoggerTargetsAClass_ThenOnlyEntriesFromThisClassDisplayInThisTarget()
+        {
+            // Load extensions
+            NLog.Config.ConfigurationItemFactory.Default.RegisterItemsFromAssembly(Assembly.Load("CommonLogging.NLogExtensions"));
+
+            // Configure NLog to write into MemTarget
+            var config = new LoggingConfiguration();
+            var memTargetCorp = new NLog.Targets.MemoryTarget();
+            memTargetCorp.Layout =
+@"{
+    ""timestamp"" : '${longdate}',
+    ""correlationId"" : '${mdc:item=correlationId}',
+    ""level"" : '${level:upperCase=true}',
+    ""message"" : '${message}',
+    ""corpName"" : '${mdc:item=corp}'
+}";
+
+            // Log as Error by default exception for Corp1:Debug
+            config.AddTarget("memTarget", memTargetCorp);
+
+            var memTargetAnotherApp = new NLog.Targets.MemoryTarget();
+            memTargetAnotherApp.Layout =
+@"{
+    ""timestamp"" : '${longdate}',
+    ""correlationId"" : '${mdc:item=correlationId}',
+    ""level"" : '${level:upperCase=true}',
+    ""message"" : '${message}',
+    ""corpName"" : '${mdc:item=corp}'
+}";
+
+            // Log as Error by default exception for Corp1:Debug
+            config.AddTarget("memTargetAnother", memTargetAnotherApp);
+
+
+            // Elevation rule applies to specific class and will log from Debug and above regardless of corp
+            var ruleAnotherApp = new LoggingRule("*.AnotherSampleApp", NLog.LogLevel.Debug, memTargetAnotherApp);
+            ruleAnotherApp.Final = true;
+            config.LoggingRules.Add(ruleAnotherApp);
+
+            // Generic rule applies to every class with corp1 only elevated to Debug
+            var rule = new LoggingRule("*", NLog.LogLevel.Debug, memTargetCorp);
+            rule.Filters.Add(new NLog.Filters.ConditionBasedFilter { Condition = NLog.Conditions.ConditionParser.ParseExpression("ignoreLogCorp('${mdc:item=corp}', level)"), Action = NLog.Filters.FilterResult.IgnoreFinal });
+            config.LoggingRules.Add(rule);
+            
+            
+
+
+            NLog.LogManager.Configuration = config;
+
+
+            var properties = new NameValueCollection();
+            var nLogAdapter = new Common.Logging.NLog.NLogLoggerFactoryAdapter(properties);
+            Common.Logging.LogManager.Adapter = nLogAdapter;
+
+            var contextCorp1 = new MySampleAppContext { CorpName = "corp1" };
+            MySampleApp appCorp1 = new MySampleApp(nLogAdapter, contextCorp1);
+
+            appCorp1.DoSomethingUsingCorpName();
+            appCorp1.DoSomethingWithoutCorpName();
+            Assert.Throws<InvalidOperationException>(() => appCorp1.ThrowSampleException());
+
+
+            var contextCorp2 = new MySampleAppContext { CorpName = "corp2" };
+            AnotherSampleApp anotherApp = new AnotherSampleApp(nLogAdapter, contextCorp2);
+
+            anotherApp.DoSomethingUsingCorpName();
+            anotherApp.DoSomethingWithoutCorpName();
+            Assert.Throws<InvalidOperationException>(() => anotherApp.ThrowSampleException());
+
+            // AnotherApp logs 5(4debug+1error)
+            memTargetAnotherApp.Logs.Count().ShouldBe(5);
+
+            // MySampleApp logs 3 (corp1=2debug+1error)
+            memTargetCorp.Logs.Count().ShouldBe(3);
+
+            
+        }
+
     }
 }
