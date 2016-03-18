@@ -15,7 +15,6 @@ namespace CommonLogging.Poc.Tests
 {
     public class TestNLogAdapter
     {
-        public Assembly Assemby { get; private set; }
 
         [Fact]
         public void TestNLogAdapter_WhenUsingNLogAdapterWithTwoMemTargets_AndMinLevelDebug_ThenAllLogsGetLoggedIntoMemTargetInfo_And_AllExceptionsGetLoggedInMemTargetException()
