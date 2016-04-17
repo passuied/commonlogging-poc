@@ -14,8 +14,8 @@ namespace CommonLogging.Poc.WebApi
         internal static void Register(HttpConfiguration config)
         {
             var hdrCorrelationID = new SwaggerHeaderParameter { Key = "correlationId", Name = "correlationId", Description = "Correlation ID", DefaultValue=Guid.NewGuid().ToString() };
-            var hdrCorp = new SwaggerHeaderParameter { Key = "corpName", Name = "corpName", Description = "client corp name" };
-            var hdrUserId = new SwaggerHeaderParameter { Key = "userID", Name = "userID", Description = "User ID" };
+            var hdrCorp = new SwaggerHeaderParameter { Key = "corpName", Name = "corpName", Description = "client corp name", DefaultValue="corp1" };
+            var hdrUserId = new SwaggerHeaderParameter { Key = "userID", Name = "userID", Description = "User ID", DefaultValue="1" };
 
             config
                 .EnableSwagger(c => {

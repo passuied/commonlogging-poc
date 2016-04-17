@@ -22,7 +22,7 @@ namespace CommonLogging.Poc.WebApi
 
             // Configure target
             var fileTarget = new NLog.Targets.FileTarget();
-            fileTarget.FileName = "${basedir}/logs/logfile.txt";
+            fileTarget.FileName = "${basedir}/../../logs/logfile.json";
             fileTarget.KeepFileOpen = false;
             fileTarget.Layout =
 @"{
