@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CommonLogging.Poc</RootNamespace>
     <AssemblyName>CommonLogging.Poc</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -48,9 +49,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IAnotherSampleManager.cs" />
     <Compile Include="ILogExtensions.cs" />
-    <Compile Include="AnotherSampleApp.cs" />
-    <Compile Include="MySampleApp.cs" />
+    <Compile Include="AnotherSampleManager.cs" />
+    <Compile Include="IMySampleManager.cs" />
+    <Compile Include="MySampleManager.cs" />
     <Compile Include="MySampleAppContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

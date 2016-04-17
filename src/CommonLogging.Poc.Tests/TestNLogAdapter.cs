@@ -57,7 +57,7 @@ memTargetException.Layout =
             Common.Logging.LogManager.Adapter = nLogAdapter;
 
             var context = new MySampleAppContext { CorpName = "corp1" };
-            MySampleApp app = new MySampleApp(nLogAdapter, context);
+            MySampleManager app = new MySampleManager(nLogAdapter, context);
 
             app.DoSomethingUsingCorpName();
             app.DoSomethingWithoutCorpName();
@@ -115,7 +115,7 @@ memTargetException.Layout =
             Common.Logging.LogManager.Adapter = nLogAdapter;
 
             var contextCorp1 = new MySampleAppContext { CorpName = "corp1" };
-            MySampleApp appCorp1 = new MySampleApp(nLogAdapter, contextCorp1);
+            MySampleManager appCorp1 = new MySampleManager(nLogAdapter, contextCorp1);
 
             appCorp1.DoSomethingUsingCorpName();
             appCorp1.DoSomethingWithoutCorpName();
@@ -123,7 +123,7 @@ memTargetException.Layout =
 
 
             var contextCorp2 = new MySampleAppContext { CorpName = "corp2" };
-            MySampleApp appCorp2 = new MySampleApp(nLogAdapter, contextCorp2);
+            MySampleManager appCorp2 = new MySampleManager(nLogAdapter, contextCorp2);
 
             appCorp2.DoSomethingUsingCorpName();
             appCorp2.DoSomethingWithoutCorpName();
@@ -162,11 +162,11 @@ memTargetException.Layout =
             var nLogAdapter = new Common.Logging.NLog.NLogLoggerFactoryAdapter(properties);
             Common.Logging.LogManager.Adapter = nLogAdapter;
 
-            var concurrentApps = new List<MySampleApp>();
+            var concurrentApps = new List<MySampleManager>();
             for (int i = 1; i <= 10; i++)
             {
                 var contextCorp = new MySampleAppContext { CorpName = "corp" +i };
-                MySampleApp appCorp = new MySampleApp(nLogAdapter, contextCorp);
+                MySampleManager appCorp = new MySampleManager(nLogAdapter, contextCorp);
                 concurrentApps.Add(appCorp);
             }
 
@@ -218,7 +218,7 @@ memTargetException.Layout =
 
 
             // Elevation rule applies to specific class and will log from Debug and above regardless of corp
-            var ruleAnotherApp = new LoggingRule("*.AnotherSampleApp", NLog.LogLevel.Debug, memTargetAnotherApp);
+            var ruleAnotherApp = new LoggingRule("*.AnotherSampleManager", NLog.LogLevel.Debug, memTargetAnotherApp);
             ruleAnotherApp.Final = true;
             config.LoggingRules.Add(ruleAnotherApp);
 
@@ -238,7 +238,7 @@ memTargetException.Layout =
             Common.Logging.LogManager.Adapter = nLogAdapter;
 
             var contextCorp1 = new MySampleAppContext { CorpName = "corp1" };
-            MySampleApp appCorp1 = new MySampleApp(nLogAdapter, contextCorp1);
+            MySampleManager appCorp1 = new MySampleManager(nLogAdapter, contextCorp1);
 
             appCorp1.DoSomethingUsingCorpName();
             appCorp1.DoSomethingWithoutCorpName();
@@ -246,7 +246,7 @@ memTargetException.Layout =
 
 
             var contextCorp2 = new MySampleAppContext { CorpName = "corp2" };
-            AnotherSampleApp anotherApp = new AnotherSampleApp(nLogAdapter, contextCorp2);
+            AnotherSampleManager anotherApp = new AnotherSampleManager(nLogAdapter, contextCorp2);
 
             anotherApp.DoSomethingUsingCorpName();
             anotherApp.DoSomethingWithoutCorpName();

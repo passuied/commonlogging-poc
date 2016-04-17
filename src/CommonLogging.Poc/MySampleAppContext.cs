@@ -15,5 +15,8 @@ namespace CommonLogging.Poc
         public Guid CorrelationID { get; set; }
 
         public string CorpName { get; set; }
+
+        public int UserID { get; set; }
+
     }
 }

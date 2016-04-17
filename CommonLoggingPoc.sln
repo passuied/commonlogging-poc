@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonLogging.Poc.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonLogging.NLogExtensions", "src\CommonLogging.NLogExtensions\CommonLogging.NLogExtensions.csproj", "{2596AD68-CF4C-4F1A-BFE1-BB0CFD6761FD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonLogging.Poc.WebApi", "src\CommonLogging.Poc.WebApi\CommonLogging.Poc.WebApi.csproj", "{53DDF6E2-7FFA-4FED-A37A-D09143D19801}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{2596AD68-CF4C-4F1A-BFE1-BB0CFD6761FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2596AD68-CF4C-4F1A-BFE1-BB0CFD6761FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2596AD68-CF4C-4F1A-BFE1-BB0CFD6761FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53DDF6E2-7FFA-4FED-A37A-D09143D19801}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53DDF6E2-7FFA-4FED-A37A-D09143D19801}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53DDF6E2-7FFA-4FED-A37A-D09143D19801}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53DDF6E2-7FFA-4FED-A37A-D09143D19801}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

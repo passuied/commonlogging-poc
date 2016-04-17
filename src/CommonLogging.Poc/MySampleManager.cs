@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace CommonLogging.Poc
 {
-    public class MySampleApp
+    public class MySampleManager : IMySampleManager
     {
-        public MySampleApp(ILog log, MySampleAppContext context)
+        public MySampleManager(ILog log, MySampleAppContext context)
         {
             this.Log = log;
             this.Context = context;
         }
 
-        public MySampleApp(ILoggerFactoryAdapter logAdapter, MySampleAppContext context)
+        public MySampleManager(ILoggerFactoryAdapter logAdapter, MySampleAppContext context)
         {
             this.Log = logAdapter.GetLogger(this.GetType());
             this.Context = context;
